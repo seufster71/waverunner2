@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.toasthub.functions.FunctionalCalendar;
 import org.toasthub.utils.Request;
 import org.toasthub.utils.Response;
 
@@ -81,7 +82,6 @@ public class StockMarketSvcImpl implements StockMarketSvc {
 		
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 	}
 
@@ -89,47 +89,56 @@ public class StockMarketSvcImpl implements StockMarketSvc {
 	@Override
 	public void getMarketData(Request request, Response response) {
 		String stockName = (String) request.getParams().get("stockName");
-		
+
 		if ("".equals(stockName)) {
 			response.addParam("error", "Stock name is empty");
 			return;
 		}
 		try {    
-		    // Get AAPL one hour, split-adjusted bars from 7/6/2021 market open
-		    // to 7/8/2021 market close from the SIP feed and print them out
-		    StockBarsResponse aaplBarsResponse = alpacaAPI.stockMarketData().getBars(
+		    // Get one hour, split-adjusted bars from 8 days ago market open
+		    // to present day (20 minutes ago) from the SIP feed and print them out
+		    StockBarsResponse stockNameBarsResponse = alpacaAPI.stockMarketData().getBars(
 		            stockName,
-		            ZonedDateTime.of(2021, 7, 6, 9, 30, 0, 0, ZoneId.of("America/New_York")),
-		            ZonedDateTime.of(2021, 7, 8, 12 + 4, 0, 0, 0, ZoneId.of("America/New_York")),
+		            ZonedDateTime.of(FunctionalCalendar.getPastYear(60 * 24 * 8),
+					FunctionalCalendar.getPastMonth(60 * 24 * 8),
+					FunctionalCalendar.getPastDay(60 * 24 * 8), 9, 30, 0, 0, ZoneId.of("America/New_York")),
+
+		            ZonedDateTime.of(FunctionalCalendar.getPastYear(20),
+					FunctionalCalendar.getPastMonth(20),
+					FunctionalCalendar.getPastDay(20),
+					FunctionalCalendar.getPastHour(20),
+					FunctionalCalendar.getPastMinute(20), 0, 0, ZoneId.of("America/New_York")),
+
 		            null,
 		            null,
 		            1,
 		            BarTimePeriod.HOUR,
 		            BarAdjustment.SPLIT,
 		            BarFeed.SIP);
-		    List<StockBar> stockBars = aaplBarsResponse.getBars();
+		    List<StockBar> stockBars = stockNameBarsResponse.getBars();
 		    response.addParam("STOCKBARS", stockBars);
 		    //.forEach(System.out::println);
 	
-		    // Get AAPL first 10 trades on 7/8/2021 at market open and print them out
-		    StockTradesResponse aaplTradesResponse = alpacaAPI.stockMarketData().getTrades(
+		    // Get first 10 trades of past day at market open and print them out
+		    StockTradesResponse stockNameTradesResponse = alpacaAPI.stockMarketData().getTrades(
 		            stockName,
-		            ZonedDateTime.of(2021, 7, 8, 9, 30, 0, 0, ZoneId.of("America/New_York")),
-		            ZonedDateTime.of(2021, 7, 8, 9, 31, 0, 0, ZoneId.of("America/New_York")),
+		            ZonedDateTime.of(FunctionalCalendar.getPastYear(60*24),
+					FunctionalCalendar.getPastMonth(60*24),
+					FunctionalCalendar.getPastDay(60*24), 9, 30, 0, 0, ZoneId.of("America/New_York")),
+
+		            ZonedDateTime.of(FunctionalCalendar.getPastYear(60*24),
+					FunctionalCalendar.getPastMonth(60*24),
+					FunctionalCalendar.getPastDay(60*24), 9, 31, 0, 0, ZoneId.of("America/New_York")),
 		            10,
 		            null);
-		    List<StockTrade> stockTrades = aaplTradesResponse.getTrades();
+		    List<StockTrade> stockTrades = stockNameTradesResponse.getTrades();
 		    response.addParam("TRADES", stockTrades);
 		    // .forEach(System.out::println);
 	
-		    // Print out latest AAPL trade
+		    // Print out latest trade
 		    Trade latestTrade = alpacaAPI.stockMarketData().getLatestTrade(stockName).getTrade();
 		    response.addParam("TRADE", latestTrade);
 
-	
-		    // Print out snapshot of AAPL, GME, and TSLA
-		  // Map<String, Snapshot> snapshots = alpacaAPI.stockMarketData().getSnapshots(Arrays.asList(stockName, "GME", "TSLA"));
-		   // snapshots.forEach((symbol, snapshot) -> System.out.printf("Symbol: %s\nSnapshot: %s\n\n", symbol, snapshot));
 		    
 		} catch (AlpacaClientException exception) {
 		    exception.printStackTrace();

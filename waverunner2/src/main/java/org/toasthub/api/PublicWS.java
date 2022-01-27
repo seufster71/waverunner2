@@ -1,8 +1,10 @@
 package org.toasthub.api;
 
 
+import org.toasthub.stockraider.BackTestingSvc;
 import org.toasthub.stockraider.CryptoMarketSvc;
 import org.toasthub.stockraider.DashboardSvc;
+import org.toasthub.stockraider.PlaceOrderSvc;
 import org.toasthub.stockraider.StockMarketSvc;
 import org.toasthub.stockraider.TradeBlasterSvc;
 import org.toasthub.utils.Request;
@@ -25,9 +27,15 @@ public class PublicWS {
 	
 	@Autowired
 	CryptoMarketSvc cryptoMarketSvc;
+
+	@Autowired
+	PlaceOrderSvc placeOrderSvc;
 	
 	@Autowired
 	DashboardSvc dashboardSvc;
+
+	@Autowired
+	BackTestingSvc backTestingSvc;
 	
 	@Autowired
 	TradeBlasterSvc tradeBlasterSvc;
@@ -46,6 +54,15 @@ public class PublicWS {
 			break;
 		case "CRYPTO":
 			cryptoMarketSvc.process(request, response);
+			break;
+		case "STOCK_BUY":
+			placeOrderSvc.placeDefaultOrder(request, response);
+			break;
+		case "TRAILING_STOP_ORDER":
+			placeOrderSvc.placeTrailingStopOrder(request, response);
+			break;
+		case "DEFAULT_BACK_TEST":
+			backTestingSvc.defaultBackTest(request, response);
 			break;
 		case "DASHBOARD":
 			dashboardSvc.process(request, response);

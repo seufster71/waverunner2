@@ -6,14 +6,16 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {useSelector, useDispatch} from 'react-redux';
 import * as stockActions from './stocks-actions';
+import * as ordersActions from '../orders/orders-action';
 import StocksView from "../stocks/view/stocks-view";
 
 function StocksContainer() {
 	const stocksState = useSelector((state) => state.stocks);
+	const amountState = useSelector((state => state.orders));
 	const appPrefs = useSelector((state) => state.appPrefs);
 	const dispatch = useDispatch();
 
-	function inputChange(type,field,value,event) {
+	function inputStockChange(type,field,value,event) {
 		let val = "";
 		if (value == null || value == "") {
 				if (event != null) {
@@ -30,11 +32,42 @@ function StocksContainer() {
 		}
 		if (type === "DATE") {
 			val = event.toISOString();
-			dispatch(stockActions.inputChange(field,val,type));
+			dispatch(stockActions.inputStockChange(field,val,type));
 		} else if (type === "TEXT") {
-			dispatch(stockActions.inputChange(field,val,type));
+			dispatch(stockActions.inputStockChange(field,val,type));
 		} else if (type === "SWITCH") {
-			dispatch(stockActions.inputChange(field,val,type));
+			dispatch(stockActions.inputStockChange(field,val,type));
+		} else if (type === "SELECT") {
+			// this.props.actions.selectChange({field,"value":val});
+		} else if (type === "SELECTCLICK") {
+			// this.props.actions.selectClick({field,value});
+		} else if (type === "SELECTUPDATE") {
+			// this.props.actions.selectListUpdate({field,"value":val});
+		}
+	}
+
+	function inputAmountChange(type,field,value,event) {
+		let val = "";
+		if (value == null || value == "") {
+				if (event != null) {
+					if (event.target != null) {
+						val = event.target.value;
+					} else {
+						val = event;
+					}
+				} else {
+					val = value;
+				}
+		} else {
+			val = value;
+		}
+		if (type === "DATE") {
+			val = event.toISOString();
+			dispatch(ordersActions.inputAmountChange(field,val,type));
+		} else if (type === "TEXT") {
+			dispatch(ordersActions.inputAmountChange(field,val,type));
+		} else if (type === "SWITCH") {
+			dispatch(ordersActions.inputAmountChange(field,val,type));
 		} else if (type === "SELECT") {
 			// this.props.actions.selectChange({field,"value":val});
 		} else if (type === "SELECTCLICK") {
@@ -52,6 +85,17 @@ function StocksContainer() {
 		}
 		
 		
+	function stockRequest() {
+		dispatch(stockActions.getStocks(stocksState.test_field));
+	}
+	function buyRequest(){
+		dispatch(ordersActions.placeOrder(stocksState.test_field, amountState.test_field));
+	}
+	function trailingStopOrder(){
+		dispatch(ordersActions.trailingStopOrder(stocksState.test_field, amountState.test_field));
+	}
+	function defaultBackTest(){
+		dispatch(ordersActions.defualtBackTest(stocksState.test_field, amountState.test_field));
 	}
 	
 	
@@ -59,9 +103,15 @@ function StocksContainer() {
 		return (
 			<StocksView
 			itemState={stocksState}
+			amountState={amountState}
 			appPrefs={appPrefs}
-			inputChange={(e) => inputChange("TEXT",'test_field','',e)}
-			onClick={onClick}
+			inputStockChange={(e) => inputStockChange("TEXT",'test_field','',e)}
+			inputAmountChange={(e)=> inputAmountChange("TEXT",'test_field','',e)}
+			stockRequest={stockRequest}
+			buyRequest={buyRequest}
+			trailingStopOrder={trailingStopOrder}
+			defaultBackTest={defaultBackTest}
+			onClick = {onClick}
 			/>
 		);
 	} else {
@@ -74,6 +124,8 @@ StocksContainer.propTypes = {
 		appPrefs: PropTypes.object,
 		actions: PropTypes.object,
 		stocksState: PropTypes.object,
+		amountState:PropTypes.object,
+		itemState: PropTypes.object,
 		session: PropTypes.object
 	};
 

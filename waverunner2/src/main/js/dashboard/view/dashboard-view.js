@@ -32,7 +32,8 @@ export default function DashboardView({itemState, appPrefs, inputChange, onClick
       		>
        			<Link to="/stocks">Stock</Link> |{" "}
         		<Link to="/crypto">Crypto</Link> |{" "}
-				<Link to="/tradeblaster">Automated Trading</Link>
+				<Link to="/tradeblaster">Automated Trading</Link>|{" "}
+				<Link to="/orders">Orders</Link>
       		</nav>
 		</div>
     );

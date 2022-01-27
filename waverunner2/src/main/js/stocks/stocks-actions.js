@@ -4,7 +4,7 @@
 import {getHost} from '../app';
 
 
-export function inputChange(field,value) {
+export function inputStockChange(field,value) {
 	 return function(dispatch) {
 		 let params = {};
 		 params.field = field;
