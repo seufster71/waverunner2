@@ -30,6 +30,25 @@ public class DashboardSvcImpl implements DashboardSvc {
 
 
 	@Override
+	public void process(Request request, Response response) {
+		String action = (String) request.getParams().get("action");
+		
+		switch (action) {
+
+		case "DASHBOARD":
+			getData(request, response);
+			break;
+		case "TEST":
+			
+			break;
+		
+		default:
+			break;
+		}
+		
+	}
+	
+	@Override
 	public void getData(Request request, Response response) {
 		
 		try {

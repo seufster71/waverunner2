@@ -107,7 +107,10 @@ export default function StocksView({itemState, appPrefs, inputChange, onClick}) 
 				autoCapitalize="off" onChange={inputChange} value={value}/>
 			</div>
 			<div> 
-				<input type="submit" name="TestButton" id="TestButton" className="form-control" value="Get Stock" onClick={onClick}/>
+				<input type="submit" name="TestButton" id="TestButton" className="form-control" value="Get Stock" onClick={(e) => onClick("List",e)}/>
+			</div>
+			<div> 
+				<input type="submit" name="TestButton" id="TestButton" className="form-control" value="Buy" onClick={(e) => onClick("Buy",e)}/>
 			</div>
 			<div> Stock Bars</div>
 			<table className="table table-striped">

@@ -2,7 +2,6 @@ package org.toasthub.stockraider;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,6 @@ import org.toasthub.utils.Request;
 import org.toasthub.utils.Response;
 
 import net.jacobpeterson.alpaca.AlpacaAPI;
-import net.jacobpeterson.alpaca.model.endpoint.clock.Clock;
-import net.jacobpeterson.alpaca.model.endpoint.common.enums.SortDirection;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.trade.Trade;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.bar.StockBar;
@@ -22,11 +19,57 @@ import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.bar.e
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.trade.StockTrade;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.trade.StockTradesResponse;
 import net.jacobpeterson.alpaca.model.endpoint.orders.Order;
-import net.jacobpeterson.alpaca.model.endpoint.orders.enums.CurrentOrderStatus;
+import net.jacobpeterson.alpaca.model.endpoint.orders.enums.OrderSide;
+import net.jacobpeterson.alpaca.model.endpoint.orders.enums.OrderTimeInForce;
 import net.jacobpeterson.alpaca.rest.AlpacaClientException;
 
 @Service("StockMarketSvc")
 public class StockMarketSvcImpl implements StockMarketSvc {
+
+	@Override
+	public void process(Request request, Response response) {
+		String action = (String) request.getParams().get("action");
+		
+		switch (action) {
+		case "STOCK_LIST":
+			getMarketData(request, response);
+			break;
+		case "BUY":
+			buy(request, response);
+			break;
+		case "TEST":
+			
+			break;
+		
+		default:
+			break;
+		}
+		
+	}
+	
+	@Override
+	public void buy(Request request, Response response) {
+		try {  
+			Order tslaLimitOrder = alpacaAPI.orders().requestLimitOrder(
+	            "TSLA",
+	            100,
+	            OrderSide.BUY,
+	            OrderTimeInForce.DAY,
+	            653.00,
+	            false);
+			String t = "";
+		} catch (AlpacaClientException exception) {
+		    exception.printStackTrace();
+		}
+	}
+
+
+	@Override
+	public void sell(Request request, Response response) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 	@Autowired
 	protected AlpacaAPI alpacaAPI = null;
@@ -92,4 +135,7 @@ public class StockMarketSvcImpl implements StockMarketSvc {
 		    exception.printStackTrace();
 		}
 	}
+
+
+	
 }

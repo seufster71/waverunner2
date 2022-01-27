@@ -4,11 +4,10 @@ package org.toasthub.api;
 import org.toasthub.stockraider.CryptoMarketSvc;
 import org.toasthub.stockraider.DashboardSvc;
 import org.toasthub.stockraider.StockMarketSvc;
+import org.toasthub.stockraider.TradeBlasterSvc;
 import org.toasthub.utils.Request;
 import org.toasthub.utils.Response;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,28 +29,29 @@ public class PublicWS {
 	@Autowired
 	DashboardSvc dashboardSvc;
 	
+	@Autowired
+	TradeBlasterSvc tradeBlasterSvc;
+	
 	
 	@RequestMapping(value = "callService", method = RequestMethod.POST)
 	public Response service(@RequestBody Request request) {
-		String action = (String) request.getParams().get("action");
+		String service = (String) request.getParams().get("service");
+		
 		
 		Response response = new Response();
-		List<String> list = new ArrayList<String>();
 		
-		switch (action) {
-		case "STOCK_LIST":
-			stockMarketSvc.getMarketData(request, response);
-			response.addParam("items", list);
+		switch (service) {
+		case "STOCK":
+			stockMarketSvc.process(request, response);
 			break;
-		case "CRYPTO_LIST":
-			cryptoMarketSvc.getMarketData(request, response);
-			response.addParam("items", list);
+		case "CRYPTO":
+			cryptoMarketSvc.process(request, response);
 			break;
 		case "DASHBOARD":
-			dashboardSvc.getData(request, response);
+			dashboardSvc.process(request, response);
 			break;
-		case "TEST":
-			
+		case "TRADEBLASTER":
+			tradeBlasterSvc.process(request, response);
 			break;
 		
 		default:

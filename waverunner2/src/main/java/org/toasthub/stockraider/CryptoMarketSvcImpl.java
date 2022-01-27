@@ -35,6 +35,24 @@ public class CryptoMarketSvcImpl implements CryptoMarketSvc {
 
 
 	@Override
+	public void process(Request request, Response response) {
+		String action = (String) request.getParams().get("action");
+		
+		switch (action) {
+		case "CRYPTO_LIST":
+			getMarketData(request, response);
+			break;
+		case "TEST":
+			
+			break;
+		
+		default:
+			break;
+		}
+		
+	}
+	
+	@Override
 	public void getMarketData(Request request, Response response) {
 		String cryptoName = (String) request.getParams().get("cryptoName"); //"BTCUSD"
 		

@@ -44,8 +44,14 @@ function StocksContainer() {
 		}
 	}
 	
-	function onClick() {
-		dispatch(stockActions.getStocks(stocksState.test_field));
+	function onClick(value,event) {
+		if (value == "List") {
+			dispatch(stockActions.getStocks(stocksState.test_field));
+		} else if ("Buy") {
+			dispatch(stockActions.buy(stocksState.test_field));
+		}
+		
+		
 	}
 	
 	

@@ -21,6 +21,7 @@ export function getDashboard(value) {
 		 let params = {};
 		 params.requestParams = {};
 		 params.requestParams.action = "DASHBOARD";
+		 params.requestParams.service = "DASHBOARD";
 		 params.URI = '/api/public/callService';
 		
 		const uri = getHost()+params.URI;
