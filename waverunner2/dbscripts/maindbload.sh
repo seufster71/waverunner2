@@ -19,7 +19,7 @@ load_base(){
 }
 	
 all() {
-	load_base waverunner2_main localhost cyborg c7b8rg
+	load_base waverunner2_main localhost cyborg c7b8rg#P
 }
 
 all

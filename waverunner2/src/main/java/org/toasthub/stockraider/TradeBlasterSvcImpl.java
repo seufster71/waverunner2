@@ -36,7 +36,6 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 		
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 	}
 

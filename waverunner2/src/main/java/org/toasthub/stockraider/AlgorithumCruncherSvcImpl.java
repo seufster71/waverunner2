@@ -30,7 +30,6 @@ public class AlgorithumCruncherSvcImpl implements AlgorithumCruncherSvc {
 		
 	@Override
 	protected void finalize() throws Throwable {
-		// TODO Auto-generated method stub
 		super.finalize();
 	}
 

@@ -20,7 +20,6 @@
 
 package org.toasthub.stockraider.model;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -30,7 +29,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "tb_trade")
-public class Trade extends BaseEntity implements Serializable{
+public class Trade extends BaseEntity{
 
 	private static final long serialVersionUID = 1L;
 	

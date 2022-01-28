@@ -67,7 +67,6 @@ public class StockMarketSvcImpl implements StockMarketSvc {
 
 	@Override
 	public void sell(Request request, Response response) {
-		// TODO Auto-generated method stub
 		
 	}
 
