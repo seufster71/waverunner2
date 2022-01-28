@@ -3,7 +3,6 @@
  */
 'use-strict';
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import {useSelector, useDispatch} from 'react-redux';
 import * as stockActions from './stocks-actions';
 import * as ordersActions from '../orders/orders-action';
@@ -83,7 +82,7 @@ function StocksContainer() {
 		} else if ("Buy") {
 			dispatch(stockActions.buy(stocksState.test_field));
 		}
-		
+	}
 		
 	function stockRequest() {
 		dispatch(stockActions.getStocks(stocksState.test_field));
@@ -119,15 +118,4 @@ function StocksContainer() {
 	}
 	
 }
-
-StocksContainer.propTypes = {
-		appPrefs: PropTypes.object,
-		actions: PropTypes.object,
-		stocksState: PropTypes.object,
-		amountState:PropTypes.object,
-		itemState: PropTypes.object,
-		session: PropTypes.object
-	};
-
-
 export default StocksContainer;
