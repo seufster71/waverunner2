@@ -20,6 +20,7 @@ export function getStocks(value) {
 		
 		 let params = {};
 		 params.requestParams = {};
+		 params.requestParams.service = "STOCK";
 		 params.requestParams.action = "STOCK_LIST";
 		 params.requestParams.stockName = value;
 		 params.URI = '/api/public/callService';

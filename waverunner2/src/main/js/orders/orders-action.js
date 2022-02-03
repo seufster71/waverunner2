@@ -16,7 +16,8 @@ export function placeOrder(value, amountValue) {
   return function (dispatch) {
     let params = {};
     params.requestParams = {};
-    params.requestParams.action = "STOCK_BUY";
+    params.requestParams.service = "PLACE_ORDER";
+    params.requestParams.action = "DEFAULT_ORDER";
     params.requestParams.stockName = value;
     params.requestParams.orderAmount = amountValue;
     params.URI = "/api/public/callService";
@@ -51,6 +52,7 @@ export function trailingStopOrder(value, amountValue) {
   return function (dispatch) {
     let params = {};
     params.requestParams = {};
+    params.requestParams.service = "PLACE_ORDER";
     params.requestParams.action = "TRAILING_STOP_ORDER";
     params.requestParams.stockName = value;
     params.requestParams.orderAmount = amountValue;
@@ -82,13 +84,18 @@ export function trailingStopOrder(value, amountValue) {
   };
 }
 
-export function defualtBackTest(value, amountValue) {
+export function defualtBackTest(state) {
   return function (dispatch) {
     let params = {};
     params.requestParams = {};
     params.requestParams.action = "DEFAULT_BACK_TEST";
-    params.requestParams.stockName = value;
-    params.requestParams.orderAmount = amountValue;
+    params.requestParams.service = "BACKTEST"
+    params.requestParams.stockName = state.stock;
+    params.requestParams.orderAmount = state.buyAmount;
+    params.requestParams.trailingStopPercent = state.trailingStopPercent;
+    params.requestParams.maxProfit = state.maxProfit;
+    params.requestParams.buySignal = state.algorithum;
+    params.requestParams.date = state.calendar;
     params.URI = "/api/public/callService";
 
     const uri = getHost() + params.URI;

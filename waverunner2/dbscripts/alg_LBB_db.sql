@@ -1,13 +1,16 @@
 
 	
-CREATE TABLE `tb_trade`
+CREATE TABLE `tb_LBB`
 	(`id` bigint(20) NOT NULL AUTO_INCREMENT,
-	`name` varchar(64),
+	`epoch_seconds` bigint(20),
 	`stock` varchar(64),
-	`buy_amount` decimal(10,4),
-	`sell_amount` decimal(10,4),
-	`algorithum` varchar(128) NOT NULL,
-	`run_status` varchar(48) NOT NULL,
+	`type` varchar(64),
+	`minute` int,
+	`hour` int,
+	`day` int,
+	`month` int,
+	`year` int,
+	`value` decimal(10,4),
 	`is_active` bit(1) DEFAULT 1,
 	`is_archive` bit(1) DEFAULT 0,
 	`is_locked` bit(1) DEFAULT 0,

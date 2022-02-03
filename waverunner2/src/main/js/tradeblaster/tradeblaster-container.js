@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from "react-router-dom";
 import * as tradeBlasterActions from './tradeblaster-actions';
+import * as orderActions from '../orders/orders-action';
 import TradeBlasterView from "../tradeblaster/view/tradeblaster-view";
 import TradeBlasterModifyView from "../tradeblaster/view/tradeblaster-modify-view";
 
@@ -36,6 +37,10 @@ function TradeBlasterContainer() {
 			case 'SAVE': {
 				onSave();
 				return true;
+			}
+			case 'BACKTEST':{
+			dispatch(orderActions.defualtBackTest(tradeBlasterState.item));
+			return true;	
 			}
 			case 'CANCEL': {
 				dispatch(tradeBlasterActions.cancelItem());

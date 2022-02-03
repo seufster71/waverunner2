@@ -5,6 +5,8 @@ import CryptoContainer from "./crypto/crypto-container";
 import StocksContainer from "./stocks/stocks-container";
 import TradeBlasterContainer from "./tradeblaster/tradeblaster-container";
 import OrdersContainer from "./orders/orders-container";
+import DatabaseContainer from "./database/database-container";
+
 
 function PageContainer() {
 
@@ -14,8 +16,9 @@ function PageContainer() {
 			<Route path="/crypto/*" element={<CryptoContainer />}/>	
 			<Route path="/stocks/*" element={<StocksContainer />}/>
 			<Route path="/tradeblaster/*" element={<TradeBlasterContainer />}/>
-			<Route path= "/orders/*" element={<OrdersContainer />}/>
-      	</Routes>
+			<Route path="/orders/*" element={<OrdersContainer />}/>
+			<Route path="/database/*" element={<DatabaseContainer />}/>
+		  </Routes>
       );
 }
 
