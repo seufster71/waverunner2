@@ -17,9 +17,8 @@
 package org.toasthub.stockraider.orders;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -27,6 +26,7 @@ import javax.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.toasthub.stockraider.model.Backtest;
 import org.toasthub.stockraider.model.Trade;
 import org.toasthub.utils.GlobalConstant;
 import org.toasthub.utils.Request;
@@ -60,79 +60,54 @@ public class TradeBlasterDaoImpl implements TradeBlasterDao {
 	}
 
 	@Override
+	public void deleteBacktest(Request request, Response response){
+		if (request.containsParam(GlobalConstant.ITEMID) && !"".equals(request.getParam(GlobalConstant.ITEMID))) {
+
+			Backtest backtest = (Backtest) entityManager.getReference(Backtest.class,
+					new Long((Integer) request.getParam(GlobalConstant.ITEMID)));
+			entityManager.remove(backtest);
+
+		} else {
+			// utilSvc.addStatus(Response.ERROR, Response.ACTIONFAILED, "Missing ID",
+			// response);
+		}
+	}
+
+
+	@Override
 	public void save(Request request, Response response) throws Exception {
 		Trade trade = (Trade) request.getParam("item");
 		entityManager.merge(trade);
 	}
 
 	@Override
-	public void saveMACD(MACD macd) {
-		Query query = queryBuilder("MACD");
-		query.setParameter("epochSeconds", macd.getEpochSeconds());
-		query.setParameter("stock", macd.getStock());
-		query.setParameter("type", macd.getType());
-		try {
-			query.getSingleResult();
-		} catch (Exception e) {
-			if (e.getMessage().equals("No entity found for query"))
-				entityManager.merge(macd);
-		}
+	public void saveBacktest(Backtest backtest){
+		entityManager.merge(backtest);
 	}
 
 	@Override
-	public void saveSL(SL sl) {
-		Query query = queryBuilder("SL");
-		query.setParameter("epochSeconds", sl.getEpochSeconds());
-		query.setParameter("stock", sl.getStock());
-		query.setParameter("type", sl.getType());
-		try {
-			query.getSingleResult();
-		} catch (Exception e) {
-			if (e.getMessage().equals("No entity found for query"))
-				entityManager.merge(sl);
+	@SuppressWarnings("unchecked")
+	public void saveAll(Map<String, List<?>> map) {
+		for (String key : map.keySet()) {
+			List<Object> list = (List<Object>) map.get(key);
+			for (Object obj : list) {
+				entityManager.merge(obj);
+			}
 		}
 	}
-
 	@Override
-	public void saveEMA(EMA ema) {
-		Query query = queryBuilder("EMA");
-		query.setParameter("epochSeconds", ema.getEpochSeconds());
-		query.setParameter("stock", ema.getStock());
-		query.setParameter("type", ema.getType());
+	public Boolean queryChecker(String alg, long epochSeconds, String type, String stock){
+		Query query = queryBuilder(alg, epochSeconds, type, stock);
 		try {
 			query.getSingleResult();
+			return true;
 		} catch (Exception e) {
 			if (e.getMessage().equals("No entity found for query"))
-				entityManager.merge(ema);
+				return false;
+			else
+			System.out.println(e.getMessage());
 		}
-	}
-
-	@Override
-	public void saveLBB(LBB lbb) {
-		Query query = queryBuilder("LBB");
-		query.setParameter("epochSeconds", lbb.getEpochSeconds());
-		query.setParameter("stock", lbb.getStock());
-		query.setParameter("type", lbb.getType());
-		try {
-			query.getSingleResult();
-		} catch (Exception e) {
-			if (e.getMessage().equals("No entity found for query"))
-				entityManager.merge(lbb);
-		}
-	}
-
-	@Override
-	public void saveSMA(SMA sma) {
-		Query query = queryBuilder("SMA");
-		query.setParameter("epochSeconds", sma.getEpochSeconds());
-		query.setParameter("stock", sma.getStock());
-		query.setParameter("type", sma.getType());
-		try {
-			query.getSingleResult();
-		} catch (Exception e) {
-			if (e.getMessage().equals("No entity found for query"))
-				entityManager.merge(sma);
-		}
+		return true;
 	}
 
 	@Override
@@ -168,6 +143,27 @@ public class TradeBlasterDaoImpl implements TradeBlasterDao {
 		List<Trade> trades = query.getResultList();
 
 		response.addParam(GlobalConstant.ITEMS, trades);
+	}
+	@Override
+	public void backtests(Request request, Response response){
+		String queryStr = "SELECT DISTINCT x FROM Backtest AS x ";
+		Query query = entityManager.createQuery(queryStr);
+		@SuppressWarnings("unchecked")
+		List<Backtest> backtests = query.getResultList();
+
+		response.addParam("backtests", backtests);
+	}
+
+	@Override
+	public void backtestCount(Request request, Response response){
+		String queryStr = "SELECT COUNT(DISTINCT x) FROM Backtest as x ";
+		Query query = entityManager.createQuery(queryStr);
+
+		Long count = (Long) query.getSingleResult();
+		if (count == null) {
+			count = 0l;
+		}
+		response.addParam("backtestCount", count);
 
 	}
 
@@ -239,28 +235,8 @@ public class TradeBlasterDaoImpl implements TradeBlasterDao {
 	}
 
 	@Override
-	public BigDecimal queryEMAValue(EMA ema) {
-		Query query = queryBuilder("EMA");
-		query.setParameter("epochSeconds", ema.getEpochSeconds() - 60);
-		query.setParameter("type", ema.getType());
-		query.setParameter("stock", ema.getStock());
-		try {
-			EMA prevEMA = (EMA) query.getSingleResult();
-			return EMA.calculateEMA(ema.getStockBars(), prevEMA.getValue());
-		} catch (Exception e) {
-			if (e.getMessage().equals("No entity found for query"))
-				return EMA.calculateEMA(ema.getStockBars());
-			else
-				System.out.println(e.getMessage());
-			return null;
-		}
-	}
-
-	@Override
 	public BigDecimal querySLValue(SL sl) {
-		Query query = queryBuilder("MACD");
-		query.setParameter("type", "MACD");
-		query.setParameter("stock", sl.getStock());
+		Query query = queryBuilder("MACD" , sl.getEpochSeconds() , sl.getType() ,sl.getStock());
 		try {
 			MACD[] macdArr = new MACD[9];
 			MACD macd;
@@ -281,9 +257,7 @@ public class TradeBlasterDaoImpl implements TradeBlasterDao {
 
 	@Override
 	public BigDecimal queryMACDValue(MACD macd) {
-		Query query = queryBuilder("EMA");
-		query.setParameter("epochSeconds", macd.getEpochSeconds());
-		query.setParameter("stock", macd.getStock());
+		Query query = queryBuilder("EMA" , macd.getEpochSeconds() , macd.getType() , macd.getStock());
 		try {
 			query.setParameter("type", "26-period");
 			EMA longEMA = (EMA) query.getSingleResult();
@@ -301,10 +275,7 @@ public class TradeBlasterDaoImpl implements TradeBlasterDao {
 
 	@Override
 	public BigDecimal queryLBBValue(LBB lbb) {
-		Query query = queryBuilder("SMA");
-		query.setParameter("epochSeconds", lbb.getEpochSeconds());
-		query.setParameter("type", lbb.getType());
-		query.setParameter("stock", lbb.getStock());
+		Query query = queryBuilder("SMA" , lbb.getEpochSeconds() , lbb.getType() , lbb.getStock());
 		try {
 			SMA sma = (SMA) query.getSingleResult();
 			return LBB.calculateLBB(lbb.getStockBars(), sma.getValue());
@@ -318,44 +289,67 @@ public class TradeBlasterDaoImpl implements TradeBlasterDao {
 	}
 
 	@Override
-	public Query queryBuilder(String alg) {
-		String queryStr = "SELECT DISTINCT x FROM " + alg + " AS x"
-				+ " WHERE x.epochSeconds =:epochSeconds"
-				+ " AND x.type =: type AND x.stock =:stock";
-		return entityManager.createQuery(queryStr);
+	public BigDecimal queryEMAValue(EMA ema){
+		Query query = queryBuilder("EMA" , ema.getEpochSeconds() , ema.getType() , ema.getStock());
+		try {
+			EMA prevEMA = (EMA) query.getSingleResult();
+			return EMA.calculateEMA(ema.getStockBars(), prevEMA.getValue());
+		} catch (Exception e) {
+			if (e.getMessage().equals("No entity found for query"))
+				return EMA.calculateEMA(ema.getStockBars());
+			else
+				System.out.println(e.getMessage());
+			return null;
+		}
 	}
 
 	@Override
-	public BigDecimal queryLatestAlgValue(String alg, String stock, String type) {
-		Instant instant = Instant.now();
-		instant.truncatedTo(ChronoUnit.MINUTES);
-		Query query = queryBuilder(alg);
-		query.setParameter("epochSeconds", instant.getEpochSecond());
+	public Query queryBuilder(String alg, long epochSeconds, String type, String stock){
+		String queryStr = "SELECT DISTINCT x FROM " + alg + " AS x"
+				+ " WHERE x.epochSeconds =:epochSeconds"
+				+ " AND x.type =: type AND x.stock =:stock";
+		Query query = entityManager.createQuery(queryStr);
+		query.setParameter("epochSeconds", epochSeconds);
 		query.setParameter("type", type);
 		query.setParameter("stock", stock);
-		switch (alg) {
-			case "SMA":
-				SMA sma = (SMA) query.getSingleResult();
-				return sma.getValue();
+		return query;
+	}
 
-			case "MACD":
-				MACD macd = (MACD) query.getSingleResult();
-				return macd.getValue();
+	@Override
+	public BigDecimal queryAlgValue(String alg, String stock, String type, long epochSeconds) {
+		Query query = queryBuilder(alg, epochSeconds , type , stock);
+		try {
+			switch (alg) {
+				case "SMA":
+					SMA sma = (SMA) query.getSingleResult();
+					return sma.getValue();
 
-			case "SL":
-				SL sl = (SL) query.getSingleResult();
-				return sl.getValue();
+				case "MACD":
+					MACD macd = (MACD) query.getSingleResult();
+					return macd.getValue();
 
-			case "EMA":
-				EMA ema = (EMA) query.getSingleResult();
-				return ema.getValue();
+				case "SL":
+					SL sl = (SL) query.getSingleResult();
+					return sl.getValue();
 
-			case "LBB":
-				LBB lbb = (LBB) query.getSingleResult();
-				return lbb.getValue();
+				case "EMA":
+					EMA ema = (EMA) query.getSingleResult();
+					return ema.getValue();
 
-			default:
+				case "LBB":
+					LBB lbb = (LBB) query.getSingleResult();
+					return lbb.getValue();
+
+				default:
+					return null;
+			}
+		} catch (Exception e) {
+			if (e.getMessage().equals("No entity found for query"))
 				return null;
+			else {
+				e.printStackTrace();
+				return null;
+			}
 		}
 	}
 }

@@ -84,42 +84,4 @@ export function trailingStopOrder(value, amountValue) {
   };
 }
 
-export function defualtBackTest(state) {
-  return function (dispatch) {
-    let params = {};
-    params.requestParams = {};
-    params.requestParams.action = "DEFAULT_BACK_TEST";
-    params.requestParams.service = "BACKTEST"
-    params.requestParams.stockName = state.stock;
-    params.requestParams.orderAmount = state.buyAmount;
-    params.requestParams.trailingStopPercent = state.trailingStopPercent;
-    params.requestParams.maxProfit = state.maxProfit;
-    params.requestParams.buySignal = state.algorithum;
-    params.requestParams.date = state.calendar;
-    params.URI = "/api/public/callService";
 
-    const uri = getHost() + params.URI;
-    let headers = new Headers();
-    headers.set("Content-type", "application/json");
-    if (params.auth != null) {
-      headers.set("Authorization", "Basic " + params.auth);
-    }
-    fetch(uri, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: headers,
-      body: JSON.stringify({ params: params.requestParams }),
-    })
-      .then(function (response) {
-        if (response.status >= 400) {
-          let responseMsg = { status: "ERROR", protocalError: response.status };
-        } else {
-          return response.json();
-        }
-      })
-      .then((responseJson) => {
-        dispatch({ type: "DEFAULT_BACK_TEST", responseJson });
-      })
-      .catch(function (error) {});
-  };
-}

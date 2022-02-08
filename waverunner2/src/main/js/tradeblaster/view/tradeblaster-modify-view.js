@@ -23,7 +23,6 @@ export default function TradeBlasterModifyView({
   let runStatus = "Not Running";
   let trailingStopPercent = "";
   let maxProfit = "";
-  let calendarValue = "";
   if (itemState.item != null) {
     if (itemState.item.name != null) {
       name = itemState.item.name;
@@ -43,9 +42,9 @@ export default function TradeBlasterModifyView({
     if (itemState.item.sellAmount != null) {
       sellAmount = itemState.item.sellAmount;
     }
-	if ( itemState.item.calendar != null){
-		calendarValue = itemState.item.calendar;
-	}
+    if (itemState.item.calendar != null) {
+      calendarValue = itemState.item.calendar;
+    }
     if (itemState.item.algorithum != null) {
       algorithum = itemState.item.algorithum;
     }
@@ -190,19 +189,6 @@ export default function TradeBlasterModifyView({
           />
         </div>
         <div>
-          <label>Date</label>
-          <input
-            type="date"
-            min="2021-01-01"
-            max="2021-12-31"
-			id="calendar"
-            name="calendar"
-            className="calendar"
-            onChange={inputChange}
-            value={calendarValue}
-          />
-        </div>
-        <div>
           <label htmlFor="Algorithum">Algorithum</label>
           <select
             id="algorithum"
@@ -237,16 +223,6 @@ export default function TradeBlasterModifyView({
             className="form-control btn-primary"
             value="Save"
             onClick={(e) => onOption("SAVE")}
-          />
-        </div>
-        <div className="col-sm">
-          <input
-            type="submit"
-            name="BackTestButton"
-            id="BackTestButton"
-            className="form-control btn-primary"
-            value="BackTest"
-            onClick={(e) => onOption("BACKTEST")}
           />
         </div>
         <div className="col-sm">

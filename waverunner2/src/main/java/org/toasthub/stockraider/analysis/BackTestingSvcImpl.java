@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.toasthub.stockraider.common.BuySignals;
 import org.toasthub.stockraider.common.Functions;
 import org.toasthub.stockraider.common.Order;
+import org.toasthub.stockraider.model.Backtest;
+import org.toasthub.stockraider.orders.TradeBlasterDao;
 import org.toasthub.utils.Request;
 import org.toasthub.utils.Response;
 
@@ -24,6 +27,9 @@ public class BackTestingSvcImpl implements BackTestingSvc {
 
     @Autowired
     protected BuySignals buySignals;
+
+    @Autowired
+    protected TradeBlasterDao tradeBlasterDao;
 
     // Constructors
     public BackTestingSvcImpl() {
@@ -48,16 +54,26 @@ public class BackTestingSvcImpl implements BackTestingSvc {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void backTest(Request request, Response response) {
-        String stockName = (String) request.getParams().get("stockName");
-        String buySignal = (String) request.getParams().get("buySignal");
-        String date = (String) request.getParams().get("date");
-        BigDecimal orderAmount = BigDecimal
-                .valueOf(Double.parseDouble((String) request.getParams().get("orderAmount")));
-        BigDecimal trailingStopPercent = BigDecimal
-                .valueOf(Double.parseDouble((String) request.getParams().get("trailingStopPercent")));
-        BigDecimal maxProfit = BigDecimal
-                .valueOf(Double.parseDouble((String) request.getParams().get("maxProfit")));
+        Map<String , ?> map = (Map<String ,?>)request.getParam("ITEM");
+        Backtest backtest = new Backtest();
+        String stockName = (String) map.get("stock");
+        String buySignal = (String) map.get("algorithum");
+        String date = (String) map.get("calendar");
+        BigDecimal orderAmount =  new BigDecimal((Integer)map.get("buyAmount"));
+        BigDecimal trailingStopPercent = new BigDecimal((Double)map.get("trailingStopPercent"));
+        BigDecimal maxProfit = new BigDecimal((Double)map.get("profitLimit"));
+        backtest.setStock((String) map.get("stock"));
+        backtest.setAlgorithum((String) map.get("algorithum"));
+        backtest.setDate((String) map.get("calendar"));
+        backtest.setBuyAmount(new BigDecimal((Integer)map.get("buyAmount")));
+        backtest.setSellAmount(new BigDecimal((Integer)map.get("sellAmount")));
+        backtest.setTrailingStopPercent(new BigDecimal((Double)map.get("trailingStopPercent")));
+        backtest.setProfitLimit(new BigDecimal((Double)map.get("profitLimit")));
+        backtest.setName((String)map.get("name"));
+
+
 
         if ("".equals(stockName)) {
             response.addParam("error", "Stock name is empty");
@@ -85,7 +101,7 @@ public class BackTestingSvcImpl implements BackTestingSvc {
                     orders.get(f).setHighPrice(stockPrice);
 
                 if ((stockPrice.compareTo(orders.get(f).getTotalProfit())) >= 0) {
-                    totalValue = totalValue.add(orders.get(f).getTotalProfit());
+                    totalValue = totalValue.add(orders.get(f).convertToDollars(stockPrice));
                     orders.remove(f);
                 } else if ((stockPrice.divide(orders.get(f).getHighPrice(), MathContext.DECIMAL32))
                         .compareTo(orders.get(f).getTrailingStopPercent()) < 0) {
@@ -97,7 +113,9 @@ public class BackTestingSvcImpl implements BackTestingSvc {
         for (int i = 0; i < orders.size(); i++)
             totalValue = totalValue.add(orders.get(i).convertToDollars(stockPrice));
 
-        response.addParam("moneySpent", moneySpent);
-        response.addParam("totalValue", totalValue);
+        backtest.setMoneySpent(moneySpent);
+        backtest.setTotalValue(totalValue);
+        tradeBlasterDao.saveBacktest(backtest);
+        
     }
 }

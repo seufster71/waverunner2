@@ -19,5 +19,6 @@ CREATE TABLE `tb_SMA`
 	`created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`lock_time` datetime,
 	`version` bigint(20) NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `UK_epoch_stock_type` (`epoch_seconds`,`stock`,`type`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_unicode_ci;

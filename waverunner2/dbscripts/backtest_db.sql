@@ -1,15 +1,17 @@
 
 	
-CREATE TABLE `tb_trade`
+CREATE TABLE `tb_backtest`
 	(`id` bigint(20) NOT NULL AUTO_INCREMENT,
 	`name` varchar(64),
 	`stock` varchar(64),
+    `date` varchar(64),
 	`buy_amount` decimal(10,4),
 	`sell_amount` decimal(10,4),
 	`profit_limit` decimal(10,4),
 	`trailing_stop_percent` decimal(10,4),
 	`algorithum` varchar(128) NOT NULL,
-	`run_status` varchar(48) NOT NULL,
+    `money_spent`decimal(10,4),
+    `total_value` decimal(10,4),
 	`is_active` bit(1) DEFAULT 1,
 	`is_archive` bit(1) DEFAULT 0,
 	`is_locked` bit(1) DEFAULT 0,

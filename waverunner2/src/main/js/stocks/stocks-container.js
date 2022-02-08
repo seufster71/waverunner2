@@ -93,9 +93,6 @@ function StocksContainer() {
 	function trailingStopOrder(){
 		dispatch(ordersActions.trailingStopOrder(stocksState.test_field, amountState.test_field));
 	}
-	function defaultBackTest(){
-		dispatch(ordersActions.defualtBackTest(stocksState.test_field, amountState.test_field));
-	}
 	
 	
 	if (stocksState != null) {
@@ -109,7 +106,6 @@ function StocksContainer() {
 			stockRequest={stockRequest}
 			buyRequest={buyRequest}
 			trailingStopOrder={trailingStopOrder}
-			defaultBackTest={defaultBackTest}
 			onClick = {onClick}
 			/>
 		);

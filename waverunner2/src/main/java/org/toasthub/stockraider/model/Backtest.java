@@ -28,8 +28,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tb_trade")
-public class Trade extends BaseEntity{
+@Table(name = "tb_backtest")
+public class Backtest extends BaseEntity{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -38,21 +38,21 @@ public class Trade extends BaseEntity{
 	protected BigDecimal buyAmount;
 	protected BigDecimal sellAmount;
 	protected String algorithum;
-	protected String runStatus;
 	protected BigDecimal trailingStopPercent;
 	protected BigDecimal profitLimit;
-
+    private BigDecimal moneySpent;
+    private BigDecimal totalValue;
+    private String date;
 
 	//Constructor
-	public Trade() {
+	public Backtest() {
 		super();
 		this.setActive(true);
 		this.setArchive(false);
 		this.setLocked(false);
 		this.setCreated(Instant.now());
 	}
-	
-	public Trade(String code, Boolean defaultLang, String dir){
+	    public Backtest(String code, Boolean defaultLang, String dir){
 		this.setActive(true);
 		this.setArchive(false);
 		this.setLocked(false);
@@ -100,14 +100,6 @@ public class Trade extends BaseEntity{
 	public void setAlgorithum(String algorithum) {
 		this.algorithum = algorithum;
 	}
-
-	@Column(name = "run_status")
-	public String getRunStatus() {
-		return runStatus;
-	}
-	public void setRunStatus(String runStatus) {
-		this.runStatus = runStatus;
-	}
 	@Column(name = "trailing_stop_percent")
 	public BigDecimal getTrailingStopPercent(){
 		return trailingStopPercent;
@@ -122,4 +114,26 @@ public class Trade extends BaseEntity{
 	public void setProfitLimit(BigDecimal profitLimit){
 		this.profitLimit = profitLimit;
 	}
+    @Column(name= "total_value")
+    public BigDecimal getTotalValue() {
+        return totalValue;
+    }
+    public void setTotalValue(BigDecimal totalValue) {
+        this.totalValue = totalValue;
+    }
+    @Column(name = "money_spent")
+    public BigDecimal getMoneySpent() {
+        return moneySpent;
+    }
+    public void setMoneySpent(BigDecimal moneySpent) {
+        this.moneySpent = moneySpent;
+    }
+    @Column(name="date")
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 }

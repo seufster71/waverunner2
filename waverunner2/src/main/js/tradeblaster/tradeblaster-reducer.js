@@ -30,6 +30,39 @@
   				if (action.responseJson.params.ITEMS != null) {
     				items = action.responseJson.params.ITEMS;
   				}
+				let backtestCount = {};
+				if(action.responseJson.params.backtestCount != null){
+					backtestCount = action.responseJson.params.backtestCount;
+				}
+				let backtests= {};
+				if(action.responseJson.params.backtests != null){
+					backtests = action.responseJson.params.backtests;
+				}
+				return Object.assign({}, state, {
+					itemCount: itemCount,
+					items: items,
+					backtestCount: backtestCount,
+					backtests: backtests,
+					backtest: {},
+					item: {},
+					view: ""
+				});
+			
+			} else {
+        		return state;
+    		}
+		}
+
+		case 'TRADEBLASTER_ITEM_LIST': {
+			if (action.responseJson != null && action.responseJson.params != null) {
+				let itemCount = {};
+  				if (action.responseJson.params.ITEMCOUNT != null) {
+    				itemCount = action.responseJson.params.ITEMCOUNT;
+  				}
+				let items = {};
+  				if (action.responseJson.params.ITEMS != null) {
+    				items = action.responseJson.params.ITEMS;
+  				}
 				return Object.assign({}, state, {
 					itemCount: itemCount,
 					items: items,
@@ -41,6 +74,30 @@
         		return state;
     		}
 		}
+
+		case 'TRADEBLASTER_BACKTEST_LIST': {
+			if (action.responseJson != null && action.responseJson.params != null) {
+				let backtestCount = {};
+				if(action.responseJson.params.backtestCount != null){
+					backtestCount = action.responseJson.params.backtestCount;
+				}
+				let backtests= {};
+				if(action.responseJson.params.backtests != null){
+					backtests = action.responseJson.params.backtests;
+				}
+				return Object.assign({}, state, {
+					backtestCount: backtestCount,
+					backtests: backtests,
+					backtest: {},
+					view: ""
+				});
+			
+			} else {
+        		return state;
+    		}
+		}
+
+
 		case 'TRADEBLASTER_ADD_ITEM': {
 			let clone = Object.assign({}, state);
 			clone.view = "ADD";
@@ -68,6 +125,21 @@
         		return state;
     		}
     	}
+		case 'TRADEBLASTER_BACKTEST':{
+			if (action.responseJson != null && action.responseJson.params != null) {
+				let item = {};
+  				if (action.responseJson.params.item != null) {
+    				item = action.responseJson.params.item;
+  				}
+				return Object.assign({}, state, {
+					item: item,
+					view: "BACKTEST"
+				});
+			
+			} else {
+        		return state;
+    		}
+		}
 		case 'TRADEBLASTER_SAVE_ITEM': {
 			if (action.responseJson != null && action.responseJson.params != null) {
 				let item = {};

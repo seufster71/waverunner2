@@ -59,7 +59,9 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 		case "DELETE":
 			delete(request, response);
 			break;
-		
+		case "DELETE_BACKTEST":
+			deleteBacktest(request, response);
+			break;
 		default:
 			break;
 		}
@@ -104,6 +106,16 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 				} else if (m.get("sellAmount") instanceof String) {
 					trade.setSellAmount(new BigDecimal((String)m.get("sellAmount")));
 				}
+				if (m.get("maxProfit") instanceof Integer) {
+					trade.setProfitLimit(new BigDecimal((Integer)m.get("maxProfit")));
+				} else if (m.get("sellAmount") instanceof String) {
+					trade.setProfitLimit((new BigDecimal((String)m.get("maxProfit"))));
+				}
+				if (m.get("trailingStopPercent") instanceof Integer) {
+					trade.setTrailingStopPercent(new BigDecimal((Integer)m.get("trailingStopPercent")));
+				} else if (m.get("trailingStopPercent") instanceof String) {
+					trade.setTrailingStopPercent(new BigDecimal((String)m.get("trailingStopPercent")));
+				}
 				if (m.containsKey("algorithum")) {
 					trade.setAlgorithum((String)m.get("algorithum"));
 				} else {
@@ -138,6 +150,23 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 		
 	}
 
+	@Override
+	public void deleteBacktest(Request request, Response response) {
+		try {
+			tradeBlasterDao.deleteBacktest(request, response);
+			tradeBlasterDao.backtestCount(request, response);
+			if ((Long) response.getParam("backtestCount") > 0) {
+				tradeBlasterDao.backtests(request, response);
+			}
+			response.setStatus(Response.SUCCESS);
+		} catch (Exception e) {
+			response.setStatus(Response.ACTIONFAILED);
+			e.printStackTrace();
+		}
+		
+	}
+		
+
 
 	@Override
 	public void item(Request request, Response response) {
@@ -159,6 +188,10 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 			if ((Long) response.getParam(GlobalConstant.ITEMCOUNT) > 0) {
 				tradeBlasterDao.items(request, response);
 			}
+			tradeBlasterDao.backtestCount(request, response);
+			if ((Long) response.getParam("backtestCount") > 0) {
+				tradeBlasterDao.backtests(request, response);
+			}
 			response.setStatus(Response.SUCCESS);
 		} catch (Exception e) {
 			response.setStatus(Response.ACTIONFAILED);
@@ -170,18 +203,18 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 	@Scheduled(cron="0 * * * * ?")
 	public void tradeAnalysisTask() {
 		
-		if (tradeAnalysisJobRunning.get()) {
-			// Prevent job from running over the top of an existing job.
-			System.out.println("Trade analysis is currently running skipping this time");
-			
-		} else {
-			tradeAnalysisJobRunning.set(true);
-			new Thread(()->{
-				algorithumCruncherSvc.load();
-				checkTrades();
-			}).start();
-			tradeAnalysisJobRunning.set(false);
-		}
+		// if (tradeAnalysisJobRunning.get()) {
+		// 	System.out.println("Trade analysis is currently running skipping this time");
+		// 	return;
+
+		// } else {
+		// 	new Thread(()->{
+		// 		tradeAnalysisJobRunning.set(true);
+		// 		algorithumCruncherSvc.load();
+		// 		checkTrades();
+		// 		tradeAnalysisJobRunning.set(false);
+		// 	}).start();
+		// }
 	}
 	
 	private void checkTrades() {

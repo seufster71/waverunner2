@@ -18,28 +18,32 @@ package org.toasthub.stockraider.orders;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Query;
 
 import org.toasthub.stockraider.common.BaseDao;
+import org.toasthub.stockraider.model.Backtest;
 import org.toasthub.stockraider.model.Trade;
 import org.toasthub.stockraider.model.algorithms.EMA;
 import org.toasthub.stockraider.model.algorithms.LBB;
 import org.toasthub.stockraider.model.algorithms.MACD;
 import org.toasthub.stockraider.model.algorithms.SL;
-import org.toasthub.stockraider.model.algorithms.SMA;
+import org.toasthub.utils.Request;
+import org.toasthub.utils.Response;
 
 public interface TradeBlasterDao extends BaseDao {
 	public List<Trade> getAutomatedTrades(String runStatus);
-	public void saveSL(SL sl);
-	public void saveMACD(MACD macd) ;
-	public void saveEMA(EMA ema) ;
-	public void saveLBB(LBB lbb) ;
-	public void saveSMA(SMA sma); 
-	public BigDecimal queryEMAValue(EMA ema);
 	public BigDecimal queryMACDValue(MACD MACD);
 	public BigDecimal queryLBBValue(LBB lbb);
 	public BigDecimal querySLValue(SL sl);
-	public BigDecimal queryLatestAlgValue(String alg, String stock, String type);
-	public Query queryBuilder(String alg);
+	public BigDecimal queryEMAValue(EMA ema);
+	public BigDecimal queryAlgValue(String alg, String stock, String type, long epochSeconds);
+	public Query queryBuilder(String alg, long epochSeconds, String type, String stock);
+	public void saveAll(Map< String , List<?> > map);
+	public Boolean queryChecker(String alg, long epochSeconds, String type, String stock);
+	public void saveBacktest(Backtest backtest);
+	public void backtests(Request request, Response response);
+	public void backtestCount(Request request, Response response);
+	public void deleteBacktest(Request request, Response response);
 }

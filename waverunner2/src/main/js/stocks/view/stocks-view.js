@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
-export default function StocksView({ itemState, amountState, appPrefs, inputStockChange, stockRequest, buyRequest, trailingStopOrder, defaultBackTest, inputAmountChange, onClick }) {
+export default function StocksView({ itemState, amountState, appPrefs, inputStockChange, stockRequest, buyRequest, trailingStopOrder, inputAmountChange, onClick }) {
 	let value = "";
 	let amountValue = "";
 	if (itemState != null && itemState.test_field != null) {
@@ -121,9 +121,6 @@ export default function StocksView({ itemState, amountState, appPrefs, inputStoc
 			</div>
 			<div>
 				<input type="submit" name="TrailingStopButton" id="TrailingStopButton" className="form-control" value="Place Trailing Stop" onClick={trailingStopOrder} />
-			</div>
-			<div>
-				<input type="submit" name="DefaultBackTestButton" id="DefaultBackTestButton" className="form-control" value="Default Back Test" onClick={defaultBackTest} />
 			</div>
 			<div> Stock Bars</div>
 			<table className="table table-striped">

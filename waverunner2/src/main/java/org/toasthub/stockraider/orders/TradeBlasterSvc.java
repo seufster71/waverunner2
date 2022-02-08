@@ -9,4 +9,5 @@ public interface TradeBlasterSvc {
 	public void delete(Request request, Response response);
 	public void item(Request request, Response response);
 	public void items(Request request, Response response);
+	public void deleteBacktest(Request request, Response response);
 }

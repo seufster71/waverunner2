@@ -6,6 +6,10 @@ import org.toasthub.stockraider.common.CurrentBuySignals;
 import org.toasthub.stockraider.model.Trade;
 
 import net.jacobpeterson.alpaca.AlpacaAPI;
+import net.jacobpeterson.alpaca.model.endpoint.orders.enums.OrderClass;
+import net.jacobpeterson.alpaca.model.endpoint.orders.enums.OrderSide;
+import net.jacobpeterson.alpaca.model.endpoint.orders.enums.OrderTimeInForce;
+import net.jacobpeterson.alpaca.model.endpoint.orders.enums.OrderType;
 
 @Service("CurrentTestingSvc")
 public class CurrentTestingSvcImpl{
@@ -26,10 +30,16 @@ public class CurrentTestingSvcImpl{
     }
 
     public void currentTest(Trade trade) {
-        String alg = trade.getAlgorithum();
-        String stock = trade.getStock();
-            if (currentBuySignals.process(alg, stock)){
-                
+            if (currentBuySignals.process(trade.getAlgorithum(), trade.getStock())){
+                try{
+                alpacaAPI.orders().requestOrder(trade.getStock(), null, trade.getBuyAmount().doubleValue(), 
+                OrderSide.BUY, OrderType.TRAILING_STOP, OrderTimeInForce.DAY, null, null, null,
+                trade.getTrailingStopPercent().doubleValue(), false, null, 
+                OrderClass.ONE_TRIGGERS_OTHER, null, null,null);
+                }catch(Exception e){
+                    System.out.println("Not Executed!");
+                    System.out.println(e.getMessage());
+                }
             }
     }
 }

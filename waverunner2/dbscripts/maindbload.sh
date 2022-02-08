@@ -48,6 +48,13 @@ load_base(){
 	else
 		echo "ERROR **** File alg_SL_db.sql is missing ***"   
 	fi
+
+	echo "Loading backtest_db.sql to ${1}"     
+	if [ -f backtest_db.sql ]; then
+   		mysql -h ${2} -u ${3} --password=${4} ${1} < backtest_db.sql
+	else
+		echo "ERROR **** File backtest_db.sql is missing ***"   
+	fi
 	
 	echo "Done Loading db ${1}"
 }
