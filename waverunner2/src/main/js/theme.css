@@ -8,3 +8,50 @@ body {
   display: block;
   margin-bottom: 20px;
 }
+form {
+  position:relative;
+}
+#formdiv {
+  position: relative;
+  display: none;
+  overflow:hidden;
+  transition:all 1s ease-in;
+}
+#formdiv.active {
+  display: block;
+}
+#operand-button{
+  position:relative;
+}
+#operand-button.active{
+  display: none;
+}
+input[type="button"] {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+#label {
+  display: block;
+  width: 100px;
+  height: 30px;
+  background-color:white;
+  text-align: center;
+  color:black;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: 0.5s;
+}
+#trade-button{
+  background-color: green;
+}
+#trade-button.active{
+  background-color: red;
+}
+#End-Date{
+  display:block;
+}
+#End-Date.active{
+  display: none;
+}

@@ -37,7 +37,8 @@ public class BuySignals {
             case "signalLineCross":
                 result = signalLineCross(stockBars,stockName);
                 break;
-
+            case "":
+                result = false;
             default:
                 break;
         }

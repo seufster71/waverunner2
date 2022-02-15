@@ -118,8 +118,15 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 				}
 				if (m.containsKey("algorithum")) {
 					trade.setAlgorithum((String)m.get("algorithum"));
-				} else {
-					trade.setAlgorithum("Algorithum1");
+				}else
+				trade.setAlgorithum("touchesLBB");
+				String algorithum2 ="";
+				if(m.containsKey("algorithum2"))
+				algorithum2 = " "+(String)m.get("algorithum2");
+				else
+				algorithum2 = " touchesLBB";
+				if(m.containsKey("operand")){
+					trade.setAlgorithum(trade.getAlgorithum() + " "+ m.get("operand") + algorithum2);
 				}
 			}
 			request.addParam("item", trade);

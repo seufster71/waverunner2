@@ -4,6 +4,7 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import moment from "moment";
+import { element } from "prop-types";
 
 export default function TradeBlasterModifyView({
   itemState,
@@ -18,7 +19,8 @@ export default function TradeBlasterModifyView({
   let stock = "";
   let buyAmount = "";
   let sellAmount = "";
-  let algorithum = "Algorithum1";
+  let algorithum = "";
+  let algorithum2 = "";
   let status = "No";
   let runStatus = "Not Running";
   let trailingStopPercent = "";
@@ -47,6 +49,9 @@ export default function TradeBlasterModifyView({
     }
     if (itemState.item.algorithum != null) {
       algorithum = itemState.item.algorithum;
+    }
+    if (itemState.item.algorithum2 != null) {
+      algorithum2 = itemState.item.algorithum2;
     }
     if (itemState.item.status != null) {
       status = itemState.item.status;
@@ -199,6 +204,52 @@ export default function TradeBlasterModifyView({
           >
             {selectOptionsAlgorithum}
           </select>
+        </div>
+        <div>
+          <button
+            id="operand-button"
+            value="AND"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById("formdiv").classList.add("active");
+              document.getElementById("operand-button").classList.add("active");
+              {inputChange(e)};
+            }}
+          >
+            Add Another algorithum
+          </button>
+          <div id="formdiv">
+            <input
+              type="button"
+              name="switch"
+              id="operand"
+              onClick={(e) => {
+                e.preventDefault();
+                var x = document.getElementById("label");
+                if (x.innerHTML === "AND") {
+                  x.innerHTML = "OR";
+                  e.target.value = "OR";
+                  {inputChange(e)};
+                } else {
+                  e.target.value = "AND";
+                  x.innerHTML = "AND";
+                  {inputChange(e)};
+                }
+              }}
+            />
+            <label id="label" for="operand">
+              AND
+            </label>
+            <select
+              id="algorithum2"
+              name="algorithum2"
+              value={algorithum2}
+              className="form-control"
+              onChange={inputChange}
+            >
+              {selectOptionsAlgorithum}
+            </select>
+          </div>
         </div>
         <div>
           <label htmlFor="Status">Active</label>

@@ -263,11 +263,11 @@ export function saveItem(item) {
       .catch(function (error) {});
   };
 }
-export function defualtBackTest(item) {
+export function swingTradeBacktest(item) {
   return function (dispatch) {
     let params = {};
     params.requestParams = {};
-    params.requestParams.action = "DEFAULT_BACK_TEST";
+    params.requestParams.action = "SWING_TRADE_BACKTEST";
     params.requestParams.service = "BACKTEST"
     params.requestParams.ITEM = item;
 
@@ -296,5 +296,39 @@ export function defualtBackTest(item) {
         dispatch(list());
       })
       .catch(function (error) {});
+  };
+}
+export function dayTradeBacktest(item) {
+  return function (dispatch) {
+    let params = {};
+    params.requestParams = {};
+    params.requestParams.action = "DAY_TRADE_BACKTEST";
+    params.requestParams.service = "BACKTEST"
+    params.requestParams.ITEM = item;
+
+    params.URI = "/api/public/callService";
+
+    const uri = getHost() + params.URI;
+    let headers = new Headers();
+    headers.set("Content-type", "application/json");
+    if (params.auth != null) {
+      headers.set("Authorization", "Basic " + params.auth);
+    }
+    fetch(uri, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: headers,
+      body: JSON.stringify({ params: params.requestParams }),
+    })
+      .then(function (response) {
+        if (response.status >= 400) {
+        } else {
+          return response.json();
+        }
+      })
+      .then(() => {
+        dispatch(list());
+      })
+      .catch(function () {});
   };
 }

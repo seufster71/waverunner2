@@ -74,7 +74,9 @@ export default function TradeBlasterView({ itemState, appPrefs, onOption }) {
       let cells = [];
       cells.push(<td key="NAME">{itemState.backtests[i].name}</td>);
       cells.push(<td key="STOCK">{itemState.backtests[i].stock}</td>);
-      cells.push(<td key="DATE">{itemState.backtests[i].date}</td>);
+      cells.push(<td key="TYPE">{itemState.backtests[i].type}</td>);
+      cells.push(<td key="STARTDATE">{itemState.backtests[i].startDate}</td>);
+      cells.push(<td key="ENDDATE">{itemState.backtests[i].endDate}</td>);
       cells.push(<td key="BUYAMOUNT">{itemState.backtests[i].buyAmount}</td>);
       cells.push(<td key="SELLAMOUNT">{itemState.backtests[i].sellAmount}</td>);
       cells.push(<td key="ALGORITHUM">{itemState.backtests[i].algorithum}</td>);
@@ -144,7 +146,9 @@ export default function TradeBlasterView({ itemState, appPrefs, onOption }) {
             <tr>
               <th scope="col">Name</th>
               <th scope="col">Stock</th>
-              <th scope="col">Date</th>
+              <th scope="col">Type</th>
+              <th scope="col">Start Date</th>
+              <th scope="col">End Date</th>
               <th scope="col">Buy Amount</th>
               <th scope="col">Sell Amount</th>
               <th scope="col">Algorithum</th>

@@ -41,8 +41,12 @@ function TradeBlasterContainer() {
         onSave();
         return true;
       }
-      case "BACKTEST": {
-        onBacktest();
+      case "DAY TRADING": {
+        dayTradeBacktest();
+        return true;
+      }
+      case "SWING TRADING":{
+        swingTradeBacktest();
         return true;
       }
       case "BACKTEST_VIEW": {
@@ -56,10 +60,16 @@ function TradeBlasterContainer() {
     }
   }
 
-  function onBacktest(){
+  function dayTradeBacktest(){
 	if (tradeBlasterState.item != null) {
-		dispatch(tradeBlasterActions.defualtBackTest(tradeBlasterState.item));
+		dispatch(tradeBlasterActions.dayTradeBacktest(tradeBlasterState.item));
 	  }
+  }
+
+  function swingTradeBacktest(){
+    if (tradeBlasterState.item != null) {
+      dispatch(tradeBlasterActions.swingTradeBacktest(tradeBlasterState.item));
+      } 
   }
 
   function onSave() {
@@ -86,6 +96,8 @@ function TradeBlasterContainer() {
         val = event;
       }
       let field = event.target.id;
+      if(event.target.id === "operand-button")
+      field = "operand";
       dispatch(tradeBlasterActions.inputChange(field, val));
     }
   }

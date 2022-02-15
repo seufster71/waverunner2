@@ -112,7 +112,10 @@ public class AlgorithumCruncherSvcImpl implements AlgorithumCruncherSvc {
 	public void backload(Request request, Response response) {
 		String stockName = "SPY";
 		String date = "2021-08-09";
-		List<StockBar> stockBars = Functions.dayTradingBars(alpacaAPI, stockName, date);
+		List<StockBar> prestockBars = Functions.dayTradingBars(alpacaAPI, stockName, date);
+        List<StockBar> overlapBars = Functions.dayTradingOverlapBars(alpacaAPI, stockName, date);
+        List<StockBar> stockBars = new ArrayList<StockBar>(overlapBars);
+        stockBars.addAll(prestockBars);
 		EMA ema13;
 		EMA ema26;
 		SMA sma;
@@ -126,7 +129,7 @@ public class AlgorithumCruncherSvcImpl implements AlgorithumCruncherSvc {
 		List<SL> slList = new ArrayList<SL>();
 		List<EMA> emaList = new ArrayList<EMA>();
 		if (stockBars != null)
-			for (int i = 51; i < stockBars.size(); i++) {
+			for (int i = overlapBars.size(); i < stockBars.size(); i++) {
 
 				ema13 = new EMA(stockName);
 				ema26 = new EMA(stockName);
@@ -188,7 +191,7 @@ public class AlgorithumCruncherSvcImpl implements AlgorithumCruncherSvc {
 	@Override
 	public void load() {
 		String stockName = "SPY";
-		List<StockBar> stockBars = Functions.functionalCurrentStockBars(alpacaAPI, stockName, 200);
+		List<StockBar> stockBars = Functions.currentStockBars(alpacaAPI, stockName, 200);
 		EMA ema13;
 		EMA ema26;
 		SMA sma;
