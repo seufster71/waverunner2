@@ -22,13 +22,15 @@ package org.toasthub.stockraider.model;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.toasthub.stockraider.common.Order;
 
 @Entity
 @Table(name = "tb_backtest")
@@ -48,6 +50,7 @@ public class Backtest extends BaseEntity {
 	private String startDate;
 	private String endDate;
 	private String type;
+	private Set<HistoricalDetail> historicalDetails;
 
 	// Constructor
 	public Backtest() {
@@ -63,6 +66,17 @@ public class Backtest extends BaseEntity {
 		this.setLocked(false);
 		this.setCreated(Instant.now());
 
+	}
+	public Backtest(Map<String, ?> map){
+		setStock((String) map.get("stock"));
+		setAlgorithum((String) map.get("algorithum"));
+        setStartDate((String) map.get("startDate"));
+        setEndDate((String) map.get("endDate"));
+        setBuyAmount(new BigDecimal((Integer) map.get("buyAmount")));
+        setSellAmount(new BigDecimal((Integer) map.get("sellAmount")));
+        setTrailingStopPercent(new BigDecimal((Double) map.get("trailingStopPercent")));
+        setProfitLimit(new BigDecimal((Double) map.get("profitLimit")));
+        setName((String) map.get("name"));
 	}
 
 	// Methods
@@ -170,5 +184,12 @@ public class Backtest extends BaseEntity {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	@OneToMany(mappedBy = "backtest" , cascade = CascadeType.ALL)
+	public Set<HistoricalDetail> getHistoricalDetails() {
+		return historicalDetails;
+	}
+	public void setHistoricalDetails(Set<HistoricalDetail> historicalDetails) {
+		this.historicalDetails = historicalDetails;
 	}
 }

@@ -11,6 +11,7 @@ public class Order {
     private BigDecimal trailingStopPercent;
     private BigDecimal totalProfit;
     private BigDecimal initialPrice;
+    private long boughtAtTime;
     
     public Order(BigDecimal dollarAmount, BigDecimal stockAmount, BigDecimal trailingStopPrice, 
                  BigDecimal trailingStopPercent, BigDecimal totalProfit, BigDecimal initialStockPrice){
@@ -37,6 +38,29 @@ public class Order {
         this.highPrice = initialStockPrice;
         this.initialPrice = initialStockPrice;
         }
+    }
+
+    public long getBoughtAtTime() {
+        return boughtAtTime;
+    }
+
+    public void setBoughtAtTime(long boughtAtTime) {
+        this.boughtAtTime = boughtAtTime;
+    }
+
+    public Order(BigDecimal dollarAmount , BigDecimal stockPrice){
+        this.dollarAmount = dollarAmount;
+        this.stockAmount = convertToShares(stockPrice);
+        this.initialPrice = stockPrice;
+        this.highPrice = stockPrice;
+    }
+
+    public Order(int shareAmount , BigDecimal stockPrice){
+        BigDecimal stockAmount = new BigDecimal(shareAmount);
+        this.stockAmount = stockAmount;
+        this.dollarAmount = convertToDollars(stockPrice);
+        this.initialPrice = stockPrice;
+        this.highPrice = stockPrice;
     }
 
     public BigDecimal getTotalProfit() {
@@ -68,6 +92,9 @@ public class Order {
     }
     public BigDecimal getTrailingStopPercent() {
         return trailingStopPercent;
+    }
+    public void setTrailingStopPercent(BigDecimal trailingStopPercent){
+        this.trailingStopPercent = trailingStopPercent;
     }
     public BigDecimal getTrailingStopPrice() {
         return trailingStopPrice;

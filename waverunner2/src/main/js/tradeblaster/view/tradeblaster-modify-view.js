@@ -24,7 +24,7 @@ export default function TradeBlasterModifyView({
   let status = "No";
   let runStatus = "Not Running";
   let trailingStopPercent = "";
-  let maxProfit = "";
+  let profitLimit = "";
   if (itemState.item != null) {
     if (itemState.item.name != null) {
       name = itemState.item.name;
@@ -35,8 +35,8 @@ export default function TradeBlasterModifyView({
     if (itemState.item.trailingStopPercent != null) {
       trailingStopPercent = itemState.item.trailingStopPercent;
     }
-    if (itemState.item.maxProfit != null) {
-      maxProfit = itemState.item.maxProfit;
+    if (itemState.item.profitLimit != null) {
+      profitLimit = itemState.item.profitLimit;
     }
     if (itemState.item.buyAmount != null) {
       buyAmount = itemState.item.buyAmount;
@@ -170,15 +170,15 @@ export default function TradeBlasterModifyView({
           />
         </div>
         <div>
-          <label htmlFor="MaxProfit">Max Profit</label>
+          <label htmlFor="Profit Limit">Profit Limit</label>
           <input
             type="Text"
-            id="maxProfit"
-            name="maxProfit"
+            id="profitLimit"
+            name="profitLimit"
             className="form-control"
             autoCapitalize="off"
             onChange={inputChange}
-            value={maxProfit}
+            value={profitLimit}
           />
         </div>
         <div>

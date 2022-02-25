@@ -9,6 +9,7 @@ import * as tradeBlasterActions from "./tradeblaster-actions";
 import TradeBlasterView from "../tradeblaster/view/tradeblaster-view";
 import TradeBlasterModifyView from "../tradeblaster/view/tradeblaster-modify-view";
 import TradeBlasterBacktestView from "../tradeblaster/view/tradeblaster-backtest-view";
+import HistoricalDetailView from "./view/tradeblaster-historicalDetail-view";
 
 function TradeBlasterContainer() {
   const tradeBlasterState = useSelector((state) => state.tradeblaster);
@@ -52,6 +53,10 @@ function TradeBlasterContainer() {
       case "BACKTEST_VIEW": {
         dispatch(tradeBlasterActions.backTest(item));
         return true;
+      }
+      case "HISTORICAL_DETAIL_VIEW":{
+        dispatch(tradeBlasterActions.historicalDetail(item));
+        return true
       }
       case "CANCEL": {
         dispatch(tradeBlasterActions.cancelItem());
@@ -102,11 +107,13 @@ function TradeBlasterContainer() {
     }
   }
 
+  
   if (
     tradeBlasterState != null &&
     tradeBlasterState.view != "MODIFY" &&
     tradeBlasterState.view != "ADD" &&
-    tradeBlasterState.view != "BACKTEST"
+    tradeBlasterState.view != "BACKTEST" &&
+    tradeBlasterState.view != "HISTORICALDETAIL"
   ) {
     return (
       <TradeBlasterView
@@ -139,7 +146,19 @@ function TradeBlasterContainer() {
         onOption={onOption}
       />
     );
-  } else {
+  } else if(
+    tradeBlasterState !=null &&
+    tradeBlasterState.view == "HISTORICALDETAIL"
+  ){
+    return (
+      <HistoricalDetailView
+        itemState={tradeBlasterState}
+        appPrefs={appPrefs}
+        onOption={onOption}
+      />
+    );
+  }
+  else {
     return <div> Loading... </div>;
   }
 }

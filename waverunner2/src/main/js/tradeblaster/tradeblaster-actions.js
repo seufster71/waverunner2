@@ -61,6 +61,12 @@ export function cancelItem() {
   };
 }
 
+export function historicalDetail(item) {
+  return function (dispatch) {
+    dispatch({ type: "TRADEBLASTER_HISTORICALDETAIL" , action: item});
+  };
+}
+
 export function modifyItem(item) {
   return function (dispatch) {
     let params = {};

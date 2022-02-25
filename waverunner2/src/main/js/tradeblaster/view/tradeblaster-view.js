@@ -90,9 +90,13 @@ export default function TradeBlasterView({ itemState, appPrefs, onOption }) {
       );
       cells.push(<td key="MONEYSPENT">{itemState.backtests[i].moneySpent}</td>);
       cells.push(<td key="TOTALVALUE">{itemState.backtests[i].totalValue}</td>);
-      automatedTradeTableRows2.push(<tr key={i}>{cells}</tr>);
       cells.push(
         <td key="DELETE">
+           <i
+            className="fa fa-microchip fa-1"
+            title="Modify"
+            onClick={() => onOption("HISTORICAL_DETAIL_VIEW", itemState.backtests[i])}
+          ></i>{" "}
           <i
             className="fa fa-trash fa-1"
             title="Delete"
@@ -100,6 +104,7 @@ export default function TradeBlasterView({ itemState, appPrefs, onOption }) {
           ></i>
         </td>
       );
+      automatedTradeTableRows2.push(<tr key={i}>{cells}</tr>);
     }
   } else {
     automatedTradeTableRows2.push(
@@ -132,7 +137,7 @@ export default function TradeBlasterView({ itemState, appPrefs, onOption }) {
               <th scope="col">Buy Amount</th>
               <th scope="col">Sell Amount</th>
               <th scope="col">Algorithum</th>
-              <th scope="col">Max Profit</th>
+              <th scope="col">Profit Limit</th>
               <th scope="col">Trailing Stop Percent</th>
               <th scope="col">Status</th>
               <th scope="col"></th>
@@ -152,7 +157,7 @@ export default function TradeBlasterView({ itemState, appPrefs, onOption }) {
               <th scope="col">Buy Amount</th>
               <th scope="col">Sell Amount</th>
               <th scope="col">Algorithum</th>
-              <th scope="col">Max Profit</th>
+              <th scope="col">Profit Limit</th>
               <th scope="col">Trailing Stop Percent</th>
               <th scope="col">Money Spent</th>
               <th scope="col">Total Value</th>

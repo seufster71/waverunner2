@@ -3,8 +3,10 @@ package org.toasthub.stockraider.analysis;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.toasthub.stockraider.common.BuySignals;
 import org.toasthub.stockraider.common.Functions;
 import org.toasthub.stockraider.common.Order;
 import org.toasthub.stockraider.model.Backtest;
+import org.toasthub.stockraider.model.HistoricalDetail;
 import org.toasthub.stockraider.orders.TradeBlasterDao;
 import org.toasthub.utils.Request;
 import org.toasthub.utils.Response;
@@ -43,7 +46,6 @@ public class BackTestingSvcImpl implements BackTestingSvc {
     @Override
     public void process(Request request, Response response) {
         String action = (String) request.getParams().get("action");
-
         switch (action) {
             case "SWING_TRADE_BACKTEST":
                 swingTradeBacktest(request, response);
@@ -58,6 +60,7 @@ public class BackTestingSvcImpl implements BackTestingSvc {
 
     public boolean evaluate(boolean alg1, boolean alg2, String operand) {
         boolean result = false;
+        
         if (operand.equals(""))
             result = alg1;
         if (operand.equals("AND"))
@@ -70,23 +73,9 @@ public class BackTestingSvcImpl implements BackTestingSvc {
     @SuppressWarnings("unchecked")
     private void swingTradeBacktest(Request request, Response response) {
         Map<String, ?> map = (Map<String, ?>) request.getParam("ITEM");
-        Backtest backtest = new Backtest();
-        String stockName = (String) map.get("stock");
-        String startDate = (String) map.get("startDate");
-        String endDate = (String) map.get("endDate");
-        BigDecimal orderAmount = new BigDecimal((Integer) map.get("buyAmount"));
-        BigDecimal trailingStopPercent = new BigDecimal((Double) map.get("trailingStopPercent"));
-        BigDecimal maxProfit = new BigDecimal((Double) map.get("profitLimit"));
-        backtest.setStock((String) map.get("stock"));
+        Backtest backtest = new Backtest(map);
         String algorithum = (String) map.get("algorithum");
-        backtest.setAlgorithum(algorithum);
-        backtest.setStartDate((String) map.get("startDate"));
-        backtest.setEndDate((String)map.get("endDate"));
-        backtest.setBuyAmount(new BigDecimal((Integer) map.get("buyAmount")));
-        backtest.setSellAmount(new BigDecimal((Integer) map.get("sellAmount")));
-        backtest.setTrailingStopPercent(new BigDecimal((Double) map.get("trailingStopPercent")));
-        backtest.setProfitLimit(new BigDecimal((Double) map.get("profitLimit")));
-        backtest.setName((String) map.get("name"));
+        Set<HistoricalDetail> historicalDetails = new LinkedHashSet<HistoricalDetail>();
 
         String alg1 = algorithum;
         String operand = "";
@@ -99,29 +88,31 @@ public class BackTestingSvcImpl implements BackTestingSvc {
                     algorithum.length());
         }
 
-        if ("".equals(stockName)) {
-            response.addParam("error", "Stock name is empty");
-            return;
-        }
-
-        List<StockBar> prestockBars = Functions.swingTradingBars(alpacaAPI, stockName, startDate, endDate);
-        List<StockBar> overlapBars = Functions.swingTradingOverlapBars(alpacaAPI, stockName, startDate);
+        List<StockBar> prestockBars = Functions.swingTradingBars(alpacaAPI, backtest.getStock(), backtest.getStartDate(), backtest.getEndDate());
+        List<StockBar> overlapBars = Functions.swingTradingOverlapBars(alpacaAPI, backtest.getStock(), backtest.getStartDate());
         List<StockBar> stockBars = new ArrayList<StockBar>(overlapBars);
         stockBars.addAll(prestockBars);
         BigDecimal totalValue = BigDecimal.ZERO;
         BigDecimal moneySpent = BigDecimal.ZERO;
         BigDecimal stockPrice = BigDecimal.ZERO;
-        List<Order> orders = new ArrayList<Order>(0);
+        long currentTime;
+        List<Order> orders = new ArrayList<Order>();
 
         for (int i = overlapBars.size(); i < stockBars.size(); i++) {
 
             stockPrice = BigDecimal.valueOf(stockBars.get(i).getClose());
-            if (evaluate(buySignals.process(stockBars, i, alg1, stockName),
-                    buySignals.process(stockBars, i, alg2, stockName),
-                    operand)) {
-                orders.add(new Order(orderAmount, null, null, trailingStopPercent,
-                        maxProfit.multiply(stockPrice), stockPrice));
-                moneySpent = moneySpent.add(orderAmount);
+            currentTime = stockBars.get(i).getTimestamp().toEpochSecond();
+            if (evaluate(
+                buySignals.process(stockBars, i, alg1, backtest.getStock()),
+                buySignals.process(stockBars, i, alg2, backtest.getStock()),
+                operand)){
+                Order order = new Order(backtest.getBuyAmount() , stockPrice);
+                order.setTrailingStopPercent(backtest.getTrailingStopPercent());
+                order.setTotalProfit(backtest.getProfitLimit().multiply(stockPrice));
+                order.setBoughtAtTime(currentTime);
+                order.setHighPrice(stockPrice);
+                orders.add(order);
+                moneySpent = moneySpent.add(backtest.getBuyAmount());
             }
 
             for (int f = orders.size() - 1; f >= 0; f--) {
@@ -129,23 +120,45 @@ public class BackTestingSvcImpl implements BackTestingSvc {
                     orders.get(f).setHighPrice(stockPrice);
 
                 if ((stockPrice.compareTo(orders.get(f).getTotalProfit())) >= 0) {
+                    HistoricalDetail historicalDetail = new HistoricalDetail();
+                    historicalDetail.setBacktest(backtest);
+                    historicalDetail.setBoughtAt(orders.get(f).getInitialPrice());
+                    historicalDetail.setBoughtAtTime(orders.get(f).getBoughtAtTime());
+                    historicalDetail.setHighPrice(orders.get(f).getHighPrice());
+                    historicalDetail.setSoldAt(stockPrice);
+                    historicalDetail.setSoldAtTime(currentTime);
+                    historicalDetails.add(historicalDetail);
                     totalValue = totalValue.add(orders.get(f).convertToDollars(stockPrice));
                     orders.remove(f);
                 } else if ((stockPrice.divide(orders.get(f).getHighPrice(), MathContext.DECIMAL32))
                         .compareTo(orders.get(f).getTrailingStopPercent()) < 0) {
+                    HistoricalDetail historicalDetail = new HistoricalDetail();
+                    historicalDetail.setBacktest(backtest);
+                    historicalDetail.setBoughtAt(orders.get(f).getInitialPrice());
+                    historicalDetail.setBoughtAtTime(orders.get(f).getBoughtAtTime());
+                    historicalDetail.setHighPrice(orders.get(f).getHighPrice());
+                    historicalDetail.setSoldAt(stockPrice);
+                    historicalDetail.setSoldAtTime(currentTime);
+                    historicalDetails.add(historicalDetail);
                     totalValue = totalValue.add(orders.get(f).convertToDollars(stockPrice));
                     orders.remove(f);
                 }
             }
         }
-        for (int i = 0; i < orders.size(); i++)
+        for (int i = 0; i < orders.size(); i++) {
             totalValue = totalValue.add(orders.get(i).convertToDollars(stockPrice));
-
+            HistoricalDetail historicalDetail = new HistoricalDetail();
+            historicalDetail.setBacktest(backtest);
+            historicalDetail.setBoughtAtTime(orders.get(i).getBoughtAtTime());
+            historicalDetail.setBoughtAt(orders.get(i).getInitialPrice());
+            historicalDetail.setHighPrice(orders.get(i).getHighPrice());
+            historicalDetails.add(historicalDetail);
+        }
+        backtest.setHistoricalDetails(historicalDetails);
         backtest.setType("Swing Trade");
         backtest.setMoneySpent(moneySpent);
         backtest.setTotalValue(totalValue);
         tradeBlasterDao.saveBacktest(backtest);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -202,6 +215,7 @@ public class BackTestingSvcImpl implements BackTestingSvc {
                 orders.add(new Order(orderAmount, null, null, trailingStopPercent,
                         maxProfit.multiply(stockPrice), stockPrice));
                 moneySpent = moneySpent.add(orderAmount);
+
             }
 
             for (int f = orders.size() - 1; f >= 0; f--) {

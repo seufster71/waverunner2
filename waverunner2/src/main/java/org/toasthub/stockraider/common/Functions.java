@@ -153,6 +153,30 @@ public class Functions {
         }
     }
 
+    public static List<StockBar> backloadBars(AlpacaAPI alpacaAPI, String stockName) {
+        try {
+            return alpacaAPI.stockMarketData().getBars(
+                    stockName,
+                    ZonedDateTime.of(2021, 1, 1, 9, 30, 0, 0, ZoneId.of("America/New_York")),
+                    ZonedDateTime.of(FunctionalCalendar.getPastYear(20),
+                    FunctionalCalendar.getPastMonth(20),
+                    FunctionalCalendar.getPastDay(20),
+                    FunctionalCalendar.getPastHour(20),
+                    FunctionalCalendar.getPastMinute(20),
+                    0, 0, ZoneId.of("America/New_York")),
+                    null,
+                    null,
+                    1,
+                    BarTimePeriod.MINUTE,
+                    BarAdjustment.SPLIT,
+                    BarFeed.SIP).getBars();
+        } catch (AlpacaClientException exception) {
+            exception.printStackTrace();
+            return null;
+        }
+    }
+    
+
     public static BigDecimal calculateSD(List<StockBar> stockBars) {
         double sum = 0.0, standardDeviation = 0.0;
         int length = stockBars.size();

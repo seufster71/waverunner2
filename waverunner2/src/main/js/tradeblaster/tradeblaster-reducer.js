@@ -110,6 +110,13 @@
 			clone.item = {};
 			return clone;
     	}
+		case 'TRADEBLASTER_HISTORICALDETAIL':{
+			let clone = Object.assign({}, state);
+			clone.view = "HISTORICALDETAIL";
+			clone.backtest = action.action;
+			return clone;
+		}
+
 		case 'TRADEBLASTER_MODIFY_ITEM': {
 			if (action.responseJson != null && action.responseJson.params != null) {
 				let item = {};
@@ -154,7 +161,7 @@
 			} else {
         		return state;
     		}
-    	}
+		}
 		default:
 		return state;
 	}

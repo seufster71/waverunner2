@@ -106,10 +106,10 @@ public class TradeBlasterSvcImpl implements TradeBlasterSvc {
 				} else if (m.get("sellAmount") instanceof String) {
 					trade.setSellAmount(new BigDecimal((String)m.get("sellAmount")));
 				}
-				if (m.get("maxProfit") instanceof Integer) {
-					trade.setProfitLimit(new BigDecimal((Integer)m.get("maxProfit")));
-				} else if (m.get("sellAmount") instanceof String) {
-					trade.setProfitLimit((new BigDecimal((String)m.get("maxProfit"))));
+				if (m.get("profitLimit") instanceof Integer) {
+					trade.setProfitLimit(new BigDecimal((Integer)m.get("profitLimit")));
+				} else if (m.get("profitLimit") instanceof String) {
+					trade.setProfitLimit((new BigDecimal((String)m.get("profitLimit"))));
 				}
 				if (m.get("trailingStopPercent") instanceof Integer) {
 					trade.setTrailingStopPercent(new BigDecimal((Integer)m.get("trailingStopPercent")));
